@@ -114,7 +114,12 @@ public class PlayerWeapon : NetworkBehaviour
         // Visualize the shot in the Scene view for 1 second
         Debug.DrawRay(ray.origin, ray.direction * weaponRange, Color.red, 1f);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, weaponRange))
+        if (Physics.Raycast(
+                ray,
+                out RaycastHit hit,
+                weaponRange,
+                Physics.DefaultRaycastLayers,
+                QueryTriggerInteraction.Collide))
         {
             Debug.Log($"[Shoot] Hit '{hit.transform.name}' " +
                        $"(layer: {LayerMask.LayerToName(hit.transform.gameObject.layer)}) " +

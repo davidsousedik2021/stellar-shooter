@@ -5,12 +5,18 @@ using System.Collections;
 
 public class PlayerHealth : NetworkBehaviour
 {
+    private const string HitboxName = "Hitbox";
+
     [Networked] public float Health { get; set; }
 
     public TextMeshProUGUI healthText;
 
     public override void Spawned()
     {
+        // Every local representation needs a collider so its Physics.Raycast can
+        // detect remote players even though their CharacterController is disabled.
+        EnsureHitbox();
+
         if (!HasStateAuthority) return;
         Health = 100f;
         Debug.Log($"[Health] {Object.Id} spawned with {Health} HP (StateAuthority: {Object.StateAuthority})");
@@ -18,8 +24,24 @@ public class PlayerHealth : NetworkBehaviour
 
     void Update()
     {
-        if (HasInputAuthority && healthText != null)
+        if (HasStateAuthority && healthText != null)
             healthText.text = $"HP: {Health:0}";
+    }
+
+    private void EnsureHitbox()
+    {
+        if (transform.Find(HitboxName) != null) return;
+
+        GameObject hitboxObject = new GameObject(HitboxName);
+        hitboxObject.layer = gameObject.layer;
+        hitboxObject.transform.SetParent(transform, false);
+
+        CapsuleCollider hitbox = hitboxObject.AddComponent<CapsuleCollider>();
+        hitbox.isTrigger = true;
+        hitbox.center = Vector3.zero;
+        hitbox.height = 2f;
+        hitbox.radius = 0.5f;
+        hitbox.direction = 1; // Y axis
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
