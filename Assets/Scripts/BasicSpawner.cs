@@ -49,7 +49,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
             nt.Teleport(spawnPos);
     }
 
-    private Vector3 GetNextSpawnPoint()
+    public Vector3 GetNextSpawnPoint()
     {
         if (spawnPoints != null && spawnPoints.Length > 0)
         {

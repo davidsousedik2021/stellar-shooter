@@ -78,10 +78,14 @@ public class PlayerHealth : NetworkBehaviour
 
         yield return new WaitForSeconds(3f);
 
-        Vector3 respawnPos = new Vector3(
-            UnityEngine.Random.Range(-8f, 8f),
-            2f,
-            UnityEngine.Random.Range(-8f, 8f));
+        BasicSpawner spawner = FindFirstObjectByType<BasicSpawner>();
+        if (spawner == null)
+        {
+            Debug.LogError("[Health] Cannot respawn: BasicSpawner was not found.");
+            yield break;
+        }
+
+        Vector3 respawnPos = spawner.GetNextSpawnPoint();
 
         // Fusion 2 – správná metoda je Teleport, ne TeleportToPosition
         GetComponent<NetworkTransform>().Teleport(respawnPos);
